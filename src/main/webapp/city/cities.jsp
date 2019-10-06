@@ -11,7 +11,9 @@
 <head>
 </head>
 <body>
-    <title>city</title>
+
+    <a href="${pageContext.request.contextPath}/index.jsp">Home</a>
+    ${pageContext.request.queryString}
     <table>
         <tr>
             <th>
@@ -52,6 +54,13 @@
             </tr>
         </c:forEach>
     </table>
-
+        <a href="?page=0">FIRST</a>
+    <c:if test="${(requestScope.current-1) >= 0}">
+        <a href="?page=${requestScope.current-1 > requestScope.last ? requestScope.last : requestScope.current-1}">PREVIOUS</a>
+    </c:if>
+    <c:if test="${requestScope.current < requestScope.last}">
+        <a href="?page=${requestScope.current + 1}">NEXT</a>
+    </c:if>
+    <a href="?page=${requestScope.last}">LAST</a>
 </body>
 </html>

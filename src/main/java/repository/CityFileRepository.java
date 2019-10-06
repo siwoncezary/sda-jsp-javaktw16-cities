@@ -1,22 +1,42 @@
 package repository;
-
-import dao.CityDaoList;
+import dao.CityDao;
+import dao.DaoList;
 import entity.CityBean;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-public class CityRepository {
-    public static CityDaoList instance;
-    private CityRepository(){
+public class CityFileRepository extends DaoList<CityBean> implements CityDao {
 
+    public CityFileRepository(InputStream inputStream){
+        super(loadCities(inputStream));
+    }
+
+    private CityFileRepository(List<CityBean> list) {
+        super(list);
+    }
+
+    @Override
+    public Stream<CityBean> findAll(){
+        return list.stream();
+    }
+
+    @Override
+    public Stream<CityBean> findByCountryCode(String countryCode){
+        return list.stream().filter(city-> city.getCountryCode().equals(countryCode));
+    }
+
+    public List<String> findCountryCodes(){
+        return list.stream()
+                .map(city -> city.getCountryCode())
+                .distinct()
+                .collect(Collectors.toList());
     }
 
     public static List<CityBean> loadCities(InputStream inputStream){
@@ -34,4 +54,5 @@ public class CityRepository {
             return city;
         }).collect(Collectors.toList());
     }
+
 }

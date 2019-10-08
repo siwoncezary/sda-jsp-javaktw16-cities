@@ -6,13 +6,13 @@
         <a href = "time.jsp" > Czas</a>
     </li>
     <li>
-        <a href="city/all">Lista wszystkich miast</a>
+        <a href="city/all?page=0">Lista wszystkich miast</a>
     </li>
     <li>
         <a href="city/find">Formularz do wyszukania miast w krajach</a>
     </li>
     <li>
-        <a href="city/one?id=1234">Opis kraju</a>
+        <a href="city/one?id=0">Opis kraju</a>
     </li>
 </ul>
 </body>

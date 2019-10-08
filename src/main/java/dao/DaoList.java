@@ -3,7 +3,7 @@ package dao;
 import java.util.List;
 import java.lang.Integer;
 
-public class DaoList<T> implements Dao<T, Integer> {
+public abstract class DaoList<T> implements Dao<T, Long> {
     protected List<T> list;
 
     public DaoList(List<T> list) {
@@ -11,15 +11,13 @@ public class DaoList<T> implements Dao<T, Integer> {
     }
 
     @Override
-    public Integer save(T obj) {
+    public void save(T obj) {
         list.add(obj);
-        return  list.indexOf(obj);
     }
 
     @Override
-    public T update(T obj, Integer index) {
-        list.set(index, obj);
-        return obj;
+    public void update(T obj, Long index) {
+        list.set(Math.toIntExact(index), obj);
     }
 
     @Override
@@ -30,7 +28,7 @@ public class DaoList<T> implements Dao<T, Integer> {
     }
 
     @Override
-    public T select(Integer index) {
-        return list.get(index);
+    public T select(Long index) {
+        return list.get(Math.toIntExact(index));
     }
 }

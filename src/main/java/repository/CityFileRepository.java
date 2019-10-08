@@ -54,5 +54,4 @@ public class CityFileRepository extends DaoList<CityBean> implements CityDao {
             return city;
         }).collect(Collectors.toList());
     }
-
 }

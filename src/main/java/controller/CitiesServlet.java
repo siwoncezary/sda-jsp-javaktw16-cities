@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.Clock;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +23,7 @@ import java.util.stream.Stream;
 @WebServlet(urlPatterns = {"/city/one", "/city/all", "/city/find", "/city/start_find"})
 public class CitiesServlet extends HttpServlet {
     private final static int PAGE_SIZE = 20;
+
 
     CityDao repository;
 
@@ -35,6 +37,10 @@ public class CitiesServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String path = req.getRequestURI();
+        /*
+            Żadanie bez podanego id wyświetla stronę bez danych,
+            Błędny format id (bp. id=1a) zgłasza wyjątek, któy jest obsługiwany przez serwlet NumberError
+         */
         if (path.endsWith("one")) {
             parseLong(req.getParameter("id"))
                     .ifPresent(id -> {
@@ -44,6 +50,9 @@ public class CitiesServlet extends HttpServlet {
                     });
             req.getRequestDispatcher("/city/city_details.jsp").forward(req, resp);
         }
+        /*
+            Brak parametru page lub jego niepoprawny format powoduje przyjęcie wartości domyślenej - page=0
+         */
         if (path.endsWith("all")) {
             long currentPage = parseLongWithDefaultValue(req.getParameter("page"));
             long lastPage = (int) (repository.findAll().count() / PAGE_SIZE);
@@ -53,6 +62,9 @@ public class CitiesServlet extends HttpServlet {
             req.getRequestDispatcher("/city/cities.jsp").forward(req, resp);
             return;
         }
+        /*
+            Żądanie bez parametru page wyświetla formularz, z podanym parametrem page wyświetla wyniki
+         */
         if (path.endsWith("find")) {
             String page = req.getParameter("page");
             if (page == null) {
@@ -107,10 +119,21 @@ public class CitiesServlet extends HttpServlet {
         }
     }
 
+    /*
+        metoda dodaje do żadania atrybuty do stronicowania
+     */
+
+    /**
+     *
+     * @param req żadanie
+     * @param currentPage numer bieżącej strony, indeksowany od zera
+     * @param lastPage numer ostatniej strony
+     * @param paramName nazwa parametru, który zawiera numery stron
+     */
     private void addNavigationAttributes(HttpServletRequest req, long currentPage, long lastPage, String paramName) {
         req.setAttribute("current", paramName + currentPage);
         req.setAttribute("last", paramName + lastPage);
-        req.setAttribute("prev", paramName + ((currentPage - 1) >= 0 ? (currentPage - 1) : 0));
+        req.setAttribute("prev", paramName + ((currentPage - 1) >= 0 ? (currentPage -1) : 0));
         req.setAttribute("next", paramName + ((currentPage + 1) <= lastPage ? (currentPage + 1) : lastPage));
     }
 }

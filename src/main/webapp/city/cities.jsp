@@ -16,18 +16,15 @@
 
     <a href="${pageContext.request.contextPath}/index.jsp">Home</a>
 
-    <p>Strona ${fn:replace(requestScope.current,'page=','')} z ${fn:replace(requestScope.last,'page=','')+1} </p>
-
-    <c:if test="${requestScope.current != 'page=0'}">
-        <a href="?${fn:replace(pageContext.request.queryString, requestScope.current, "page=0")}">FIRST</a>
-    </c:if>
-    <c:if test="${requestScope.current != requestScope.prev}">
+    <p>Strona ${fn:replace(requestScope.current,'page=','')} z ${fn:replace(requestScope.last,'page=','')} </p>
+    <a href="?${fn:replace(pageContext.request.queryString, requestScope.current, "page=1")}">FIRST</a>
+    <c:if test="${requestScope.prev != null}">
         <a href="?${fn:replace(pageContext.request.queryString, requestScope.current, requestScope.prev)}">PREVIOUS</a>
     </c:if>
-    <c:if test="${requestScope.current != requestScope.next}">
+    <c:if test="${requestScope.next != null}">
         <a href="?${fn:replace(pageContext.request.queryString, requestScope.current, requestScope.next)}">NEXT</a>
     </c:if>
-    <c:if test="${requestScope.current != requestScope.last}">
+    <c:if test="${requestScope.last != null}">
         <a href="?${fn:replace(pageContext.request.queryString, requestScope.current, requestScope.last)}">LAST</a>
     </c:if>
     <table>

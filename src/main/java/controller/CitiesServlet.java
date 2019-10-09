@@ -4,6 +4,7 @@ import com.sun.istack.Nullable;
 import dao.CityDao;
 import repository.CityFileRepository;
 import entity.CityBean;
+import util.Paginator;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -55,10 +56,11 @@ public class CitiesServlet extends HttpServlet {
          */
         if (path.endsWith("all")) {
             long currentPage = parseLongWithDefaultValue(req.getParameter("page"));
-            long lastPage = (int) (repository.findAll().count() / PAGE_SIZE);
-            currentPage = Long.min(currentPage, lastPage);
-            addNavigationAttributes(req, currentPage, lastPage, "page=");
-            req.setAttribute("cities", getPage(repository.findAll(), currentPage, PAGE_SIZE));
+            Paginator.of(repository.findAll().count(), currentPage, PAGE_SIZE)
+                    .ifPresent( paginator -> {
+                            addNavigationAttributes(req, paginator, "page=");
+                            req.setAttribute("cities", paginator.getPaged(repository.findAll()));
+                    });
             req.getRequestDispatcher("/city/cities.jsp").forward(req, resp);
             return;
         }
@@ -119,12 +121,8 @@ public class CitiesServlet extends HttpServlet {
         }
     }
 
-    /*
-        metoda dodaje do żadania atrybuty do stronicowania
-     */
-
     /**
-     *
+     * metoda dodaje do żadania atrybuty do stronicowania
      * @param req żadanie
      * @param currentPage numer bieżącej strony, indeksowany od zera
      * @param lastPage numer ostatniej strony
@@ -135,5 +133,16 @@ public class CitiesServlet extends HttpServlet {
         req.setAttribute("last", paramName + lastPage);
         req.setAttribute("prev", paramName + ((currentPage - 1) >= 0 ? (currentPage -1) : 0));
         req.setAttribute("next", paramName + ((currentPage + 1) <= lastPage ? (currentPage + 1) : lastPage));
+    }
+
+    private void addNavigationAttributes(HttpServletRequest req, Paginator paginator, String paramName) {
+        req.setAttribute("current", paramName + paginator.current());
+        req.setAttribute("last", paramName + paginator.last());
+        paginator.prev().ifPresent(page -> {
+            req.setAttribute("prev", paramName + page);
+        });
+        paginator.next().ifPresent(page -> {
+            req.setAttribute("next", paramName + page);
+        });
     }
 }

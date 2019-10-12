@@ -12,8 +12,7 @@
 <head>
 </head>
 <body>
-    ${pageContext.request.queryString}
-    ${pageContext.request.contextPath}
+    <a href = ${pageContext.request.contextPath}/index.jsp>HOME</a>
     <title>city</title>
     <table>
         <tr>
@@ -41,7 +40,7 @@
                 <tr style="color: red">
             </c:if>
                 <td>
-                    ${city.id}
+                   ${city.id}
                 </td>
                 <td>
                     ${city.name}
@@ -55,20 +54,6 @@
             </tr>
         </c:forEach>
     </table>
-    <%--
-    <a href="?page=1">pierwsza</a>
-    <c:if test="${requestScope.prev != null}">
-        <a href="?page=${requestScope.prev}">poprzednia</a>
-    </c:if>
-
-    <c:if test="${requestScope.next != null}">
-        <a href="?page=${requestScope.next}">następna</a>
-    </c:if>
-    <c:if test="${requestScope.next == null}">
-        <span> następna</span>
-    </c:if>
-    <a href="?page=${requestScope.last}">ostatnia</a>
-    --%>
     <a href="?${fn:replace(
          pageContext.request.queryString,
          requestScope.current,

@@ -12,6 +12,7 @@
 </head>
 <body>
     <H1>${requestScope.city.name}</H1>
+    <a href = ${pageContext.request.contextPath}/index.jsp>HOME</a>
     <p>kod kraju: ${city.countryCode}</p>
     <p>szerokość geograficzna: ${requestScope.city.latitude} </p>
     <p>długość geograficzna: ${requestScope.city.longitude}</p>

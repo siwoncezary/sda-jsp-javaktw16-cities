@@ -12,6 +12,7 @@
     <title>Find city</title>
 </head>
 <body>
+<a href = ${pageContext.request.contextPath}/index.jsp>HOME</a>
     <form action="?find" method="get">
         <select name="countryCode">
             <c:forEach items="${requestScope.codes}" var="code">

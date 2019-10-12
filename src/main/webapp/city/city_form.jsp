@@ -12,12 +12,13 @@
     <title>Find city</title>
 </head>
 <body>
-    <form action="find" method="post">
+    <form action="?find" method="get">
         <select name="countryCode">
             <c:forEach items="${requestScope.codes}" var="code">
                 <option value="${code}">${code}</option>
             </c:forEach>
         </select>
+        <input type="hidden" name="page" value="1">
         <button type="submit">Znajdź</button>
     </form>
 </body>

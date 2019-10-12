@@ -3,6 +3,7 @@ package controller;
 import dao.CityDaoList;
 import entity.CityBean;
 import repository.CityRepository;
+import util.Paginator;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -19,6 +20,8 @@ import java.util.stream.Collectors;
 @WebServlet(urlPatterns = {"/city/one", "/city/all", "/city/find"})
 public class CitiesServlet extends HttpServlet {
     CityDaoList dao;
+    static final int PAGE_SIZE = 10;
+
     @Override
     public void init() throws ServletException {
         ServletContext context = getServletContext();
@@ -35,23 +38,66 @@ public class CitiesServlet extends HttpServlet {
             req.getRequestDispatcher("/city/city_details.jsp").forward(req,resp);
             return;
         }
+
         if (path.endsWith("all")){
-            req.setAttribute("cities", getAll());
-            req.getRequestDispatcher("/city/cities.jsp").forward(req, resp);
+            String pageStr = req.getParameter("page");
+            int page;
+            if (pageStr == null) {
+                page = 1;
+            } else {
+                page = Integer.valueOf(pageStr);
+            }
+            Paginator.ofStream(dao.findAll(), PAGE_SIZE, page).ifPresent(
+                    paginator -> {
+                        addPagingAttributes(req, page, paginator);
+                        try {
+                            req.getRequestDispatcher("/city/cities.jsp").forward(req, resp);
+                        } catch (ServletException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+            );
             return;
         }
+
         if (path.endsWith("find")){
-            req.setAttribute("codes", dao.findCountryCodes());
-            req.getRequestDispatcher("/city/city_form.jsp").forward(req, resp);
+            String pageStr = req.getParameter("page");
+            if (pageStr == null) {
+                req.setAttribute("codes", dao.findCountryCodes());
+                req.getRequestDispatcher("/city/city_form.jsp").forward(req, resp);
+            } else {
+                int page = Integer.valueOf(pageStr);
+                String value = req.getParameter("countryCode");
+                Paginator.ofStream(getBy("countryCode", value).stream(), PAGE_SIZE, page).ifPresent(
+                        paginator -> {
+                            addPagingAttributes(req, page, paginator);
+                            try {
+                                req.getRequestDispatcher("/city/cities.jsp").forward(req, resp);
+                            } catch (ServletException e) {
+                                e.printStackTrace();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                );
+            }
             return;
         }
     }
 
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String value = req.getParameter("countryCode");
-        req.setAttribute("cities", getBy("countryCode", value));
-        req.getRequestDispatcher("/city/cities.jsp").forward(req, resp);
+    private void addPagingAttributes(HttpServletRequest req, int page, Paginator paginator) {
+        req.setAttribute("cities", paginator.getPage());
+
+        req.setAttribute("current", "page="+page);
+        paginator.next().ifPresent(p->{
+            req.setAttribute("next", "page=" + p);
+        });
+        paginator.prev().ifPresent(p->{
+            req.setAttribute("prev", "page=" + p);
+        });
+        req.setAttribute("last", "page="+paginator.count());
     }
 
     private List<CityBean> getAll(){

@@ -7,10 +7,13 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <html>
 <head>
 </head>
 <body>
+    ${pageContext.request.queryString}
+    ${pageContext.request.contextPath}
     <title>city</title>
     <table>
         <tr>
@@ -52,5 +55,43 @@
             </tr>
         </c:forEach>
     </table>
+    <%--
+    <a href="?page=1">pierwsza</a>
+    <c:if test="${requestScope.prev != null}">
+        <a href="?page=${requestScope.prev}">poprzednia</a>
+    </c:if>
+
+    <c:if test="${requestScope.next != null}">
+        <a href="?page=${requestScope.next}">następna</a>
+    </c:if>
+    <c:if test="${requestScope.next == null}">
+        <span> następna</span>
+    </c:if>
+    <a href="?page=${requestScope.last}">ostatnia</a>
+    --%>
+    <a href="?${fn:replace(
+         pageContext.request.queryString,
+         requestScope.current,
+         "page=1"
+         )}">pierwsza</a>
+    <c:if test="${requestScope.prev != null}">
+        <a href="?${fn:replace(
+         pageContext.request.queryString,
+         requestScope.current,
+         requestScope.prev
+         )}">poprzednia</a>
+    </c:if>
+    <c:if test="${requestScope.next != null}">
+        <a href="?${fn:replace(
+         pageContext.request.queryString,
+         requestScope.current,
+         requestScope.next
+         )}">następna</a>
+    </c:if>
+    <a href="?${fn:replace(
+         pageContext.request.queryString,
+         requestScope.current,
+         requestScope.last
+         )}">ostatnia</a>
 </body>
 </html>
